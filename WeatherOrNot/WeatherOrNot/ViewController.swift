@@ -12,6 +12,8 @@ class ViewController: UIViewController {
     
     var scrollView: UIScrollView! = nil
     var containerView: UIView! = nil
+    
+    var myWeather: Weather? = nil
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -27,6 +29,19 @@ class ViewController: UIViewController {
         scrollView.delegate = self
         scrollView.contentSize = CGSize(width: 2000, height: 0)
         containerView.addSubview(scrollView)
+        
+        let myTemp = Temperature(kelvin: 291.483)
+        myWeather = Weather(wthr: WeatherType.Texas, temp: myTemp, humid: "43%")
+        
+        print(myWeather?.temperature.celsius ?? "")
+        print(myWeather?.temperature.fahrenheit ?? "")
+        
+        let aString = "hello"
+        
+        let a = aString.removeTrailingZeros(number: "hello")
+        print(a)
+
+
     }
 
     override func didReceiveMemoryWarning() {
