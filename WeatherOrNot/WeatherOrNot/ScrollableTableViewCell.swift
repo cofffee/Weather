@@ -22,8 +22,8 @@ class ScrollableTableViewCell: UITableViewCell {
         let collectionFrame: CGRect = CGRect(x: 0, y: 0, width: contentView.frame.width, height: contentView.frame.height)
         collectionView = UICollectionView(frame: collectionFrame, collectionViewLayout: layout)
         collectionView?.backgroundColor = UIColor.gray
-        layout.sectionInset = UIEdgeInsetsMake(10, 10, 10, 10)
-        layout.itemSize = CGSize(width: 88, height: 120)
+        layout.sectionInset = UIEdgeInsetsMake(10, 2, 10, 2)
+        layout.itemSize = CGSize(width: 88, height: 140)
         layout.minimumInteritemSpacing = 2
         layout.scrollDirection = .horizontal
         
