@@ -29,7 +29,8 @@ class ViewController: UIViewController {
         
         
         
-        let mainScreenTableViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+        let mainScreenTableViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height - 44.0)
+//        tabViewController.tabBar.frame.size.height
         mainScreenTableView = UITableView(frame: mainScreenTableViewFrame)
         mainScreenTableView?.delegate = self
         mainScreenTableView?.dataSource = self
@@ -64,7 +65,7 @@ class ViewController: UIViewController {
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     //# OF ROWS
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 2
     }
     
     //CELLS!
@@ -125,6 +126,18 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         
         headerOpacity = opacity
     }
+    
+    //footer!!
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 0.0
+    }
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let aViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: 0.0)
+        let footerView = UIView(frame: aViewFrame)
+        footerView.backgroundColor = UIColor.red.withAlphaComponent(0.3)
+        return footerView
+    }
+    
 }
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
@@ -144,6 +157,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
 extension ViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        //tag 1234 is main top header view
         if scrollView.tag == 1234 {
             let sectionHeaderHeight:CGFloat = (5 / 6) * view.frame.height - 200
             //scroll down and up
