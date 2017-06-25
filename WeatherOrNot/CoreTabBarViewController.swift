@@ -32,7 +32,7 @@ class CoreTabBarViewController: UITabBarController {
         thirdVC.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 2)
         thirdVC.view.backgroundColor = UIColor.yellow
         
-        let vcs = [ navBar, secondVC, thirdVC ]
+        let vcs = [ firstVC, secondVC, thirdVC ]
         viewControllers = vcs
     }
 
