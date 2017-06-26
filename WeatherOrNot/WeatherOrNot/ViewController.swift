@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     var timer = Timer()
     lazy var reloadControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
-        refreshControl.backgroundColor = UIColor.gray
+        refreshControl.backgroundColor = UIColor(red: 137/255, green: 181/255, blue: 218/255, alpha: 1.0)
         refreshControl.tintColor = UIColor.black
         refreshControl.addTarget(self, action: #selector(self.handleRefresh(refreshControl:)), for: UIControlEvents.valueChanged)
 

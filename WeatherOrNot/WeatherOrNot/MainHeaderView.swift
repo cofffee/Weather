@@ -46,7 +46,7 @@ class MainHeaderView: UIView {
         temparatureLabel?.textColor = UIColor.black
         temparatureLabel?.textAlignment = .center
         temparatureLabel?.lineBreakMode = .byCharWrapping
-        temparatureLabel?.text = "143°"
+        temparatureLabel?.text = "43°"
         
         let cityNameLabelFrame:CGRect = CGRect(x: 0, y: frame.size.height - 30.0 , width: frame.width - 8.0, height: 22)
         cityNameLabel = UILabel(frame: cityNameLabelFrame)
