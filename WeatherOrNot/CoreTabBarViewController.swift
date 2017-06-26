@@ -28,7 +28,7 @@ class CoreTabBarViewController: UITabBarController {
         secondVC.tabBarItem = UITabBarItem(tabBarSystemItem: .bookmarks, tag: 1)
         secondVC.view.backgroundColor = UIColor.cyan
         
-        let thirdVC = SecondViewController()
+        let thirdVC = WeatherPageViewController()
         thirdVC.tabBarItem = UITabBarItem(tabBarSystemItem: .favorites, tag: 2)
         thirdVC.view.backgroundColor = UIColor.yellow
         
