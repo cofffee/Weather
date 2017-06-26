@@ -16,6 +16,39 @@ enum mainTableCellType: String {
 
 class ViewController: UIViewController {
     
+    //*******pull down refresh attributes*******//
+    var timer = Timer()
+    lazy var reloadControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.backgroundColor = UIColor.gray
+        refreshControl.tintColor = UIColor.black
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(refreshControl:)), for: UIControlEvents.valueChanged)
+
+        return refreshControl
+    }()
+    
+    var pullRefreshTimeStamp:String?{
+        
+        return "Yo the time is 10:17!"
+    }
+    
+    let pullDownfontAttributes = [
+        NSForegroundColorAttributeName: UIColor.black,
+        NSFontAttributeName:UIFont(name: "PingFangTC-Light", size: 17.0),
+        ]
+    
+    func handleRefresh(refreshControl: UIRefreshControl) {
+        mainScreenTableView?.reloadData()
+        runTimer()
+    }
+    func runTimer() {
+        timer = Timer.scheduledTimer(timeInterval: 5, target: self,   selector: (#selector(ViewController.endRefresh)), userInfo: nil, repeats: false)
+    }
+    func endRefresh() {
+        reloadControl.endRefreshing()
+    }
+    //*******pull down refresh attributes*******//
+    
     let goldenRatio: CGFloat = 7 / 9
     var scrollView: UIScrollView! = nil
     var containerView: UIView! = nil
@@ -41,6 +74,10 @@ class ViewController: UIViewController {
 
         mainScreenTableView?.register(LongTableViewCell.self, forCellReuseIdentifier: "longcell")
         mainScreenTableView!.tag = 1234
+        
+        reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes)
+        mainScreenTableView?.addSubview(reloadControl)
+        
         view.addSubview(mainScreenTableView!)
         
         /*
@@ -178,7 +215,7 @@ extension ViewController: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //tag 1234 is main top header view
         if scrollView.tag == 1234 {
-            let sectionHeaderHeight:CGFloat = goldenRatio * view.frame.height - 100
+            let sectionHeaderHeight:CGFloat = goldenRatio * view.frame.height - 60
             //scroll down and up
             if scrollView.contentOffset.y <= sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
                 
