@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Darwin
 
 enum mainTableCellType: String {
     case HorizontalScrollable
@@ -15,6 +16,7 @@ enum mainTableCellType: String {
 
 class ViewController: UIViewController {
     
+    let goldenRatio: CGFloat = 7 / 9
     var scrollView: UIScrollView! = nil
     var containerView: UIView! = nil
     
@@ -22,7 +24,7 @@ class ViewController: UIViewController {
     
     var myWeather: Weather? = nil
     var headerOpacity: CGFloat? = 1.0
-    var topTableHeaderView: UIView? = nil
+    var topTableHeaderView: MainHeaderView? = nil
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,13 +110,13 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     //HMM SECTIONS!
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return (2 / 3) * view.frame.height
+        return goldenRatio * view.frame.height
     }
     //HEADER
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let topViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: 100.0)
-        topTableHeaderView = UIView(frame: topViewFrame)
-        topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(headerOpacity!)
+        let topViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: goldenRatio * view.frame.height)
+        topTableHeaderView = MainHeaderView(frame: topViewFrame)
+        topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(0.0)
         return topTableHeaderView
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -140,36 +142,62 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     
 }
 
-extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         //dataArray[collectionView.tag].count
-        return 7
+        return 12
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath)
-        cell.backgroundColor = UIColor.orange
+        let modRow = indexPath.row % 4
+        switch modRow {
+        case 0:
+            cell.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0)
+        case 1:
+            cell.backgroundColor = UIColor(red: 242/255, green: 226/255, blue: 151/255, alpha: 1.0)
+        case 2:
+            cell.backgroundColor = UIColor(red: 137/255, green: 181/255, blue: 218/255, alpha: 1.0)
+        case 3:
+            cell.backgroundColor = UIColor(red: 97/255, green: 213/255, blue: 212/255, alpha: 1.0)
+        default:
+            print("How did you get here")
+        }
         
         return cell
     }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: 100.0, height: 160.0)
+    }
+    
 }
+
 extension ViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //tag 1234 is main top header view
         if scrollView.tag == 1234 {
-            let sectionHeaderHeight:CGFloat = (5 / 6) * view.frame.height - 200
+            let sectionHeaderHeight:CGFloat = goldenRatio * view.frame.height - 100
             //scroll down and up
             if scrollView.contentOffset.y <= sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
                 
                 getOpacityFade(y: scrollView.contentOffset.y, x: sectionHeaderHeight)
-                topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(headerOpacity!)
+                
+                UIView.animate(withDuration: 0.2, delay: 0.1, options: [],
+                               animations: {
+                                self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(self.headerOpacity!)
+                                self.topTableHeaderView?.weatherImage?.alpha = 1 - self.headerOpacity!
+                }, 
+                               completion: nil
+                )
+                
                 
                 scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0, 0)
                 
             } else if scrollView.contentOffset.y >= sectionHeaderHeight {
                 scrollView.contentInset = UIEdgeInsetsMake(-sectionHeaderHeight, 0, 0, 0)
+                self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(1.0)
             }
         } else {
         
