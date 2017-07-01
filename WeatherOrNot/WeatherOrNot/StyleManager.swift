@@ -37,12 +37,12 @@ class StyleManager {
     func chooseDudeClothes(weather: Weather) -> Outfit {
         var dudeFit: Outfit!
         
-        if let temp = Double(weather.temperature.fahrenheit) {
-            if temp > 70 {
-                //configure fits first!!!
-//                dudeFit = Outfit(
-            }
-        }
+//        if let temp = Double(weather.temperature.fahrenheit) {
+//            if temp > 70 {
+//                //configure fits first!!!
+////                dudeFit = Outfit(
+//            }
+//        }
 
         
         return dudeFit
