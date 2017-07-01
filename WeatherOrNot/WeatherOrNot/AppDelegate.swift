@@ -24,6 +24,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.rootViewController = coretab
         self.window?.makeKeyAndVisible()
 //        printFonts()
+        
+        let stuff = NetworkHandler(zip: "78751")
+        stuff.request()
+        
         return true
     }
 

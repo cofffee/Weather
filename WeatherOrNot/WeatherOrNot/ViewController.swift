@@ -50,7 +50,7 @@ class ViewController: UIViewController {
     //*******pull down refresh attributes*******//
     
     let goldenRatio: CGFloat = 7 / 9
-    var scrollView: UIScrollView! = nil
+//    var scrollView: UIScrollView! = nil
     var containerView: UIView! = nil
     
     var mainScreenTableView:UITableView? = nil
@@ -77,6 +77,7 @@ class ViewController: UIViewController {
         
         reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes)
         mainScreenTableView?.addSubview(reloadControl)
+        mainScreenTableView?.alwaysBounceVertical = true
         
         view.addSubview(mainScreenTableView!)
         
@@ -104,7 +105,7 @@ class ViewController: UIViewController {
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     //# OF ROWS
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 2
+        return 12
     }
     
     //CELLS!
@@ -147,6 +148,9 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     //HMM SECTIONS!
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return goldenRatio * view.frame.height
+    }
+    func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
         return goldenRatio * view.frame.height
     }
     //HEADER
@@ -214,9 +218,12 @@ extension ViewController: UIScrollViewDelegate {
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //tag 1234 is main top header view
+        print(scrollView.contentInset.top)
+        
         if scrollView.tag == 1234 {
             let sectionHeaderHeight:CGFloat = goldenRatio * view.frame.height - 60
             //scroll down and up
+//            scrollView.alwaysBounceVertical = true
             if scrollView.contentOffset.y <= sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
                 
                 getOpacityFade(y: scrollView.contentOffset.y, x: sectionHeaderHeight)
@@ -229,18 +236,20 @@ extension ViewController: UIScrollViewDelegate {
                                completion: nil
                 )
                 
-                
+                print("scroll view content offset\(-scrollView.contentOffset.y)")
                 scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0, 0)
                 
             } else if scrollView.contentOffset.y >= sectionHeaderHeight {
+//                print("section header height \(-sectionHeaderHeight)")
                 scrollView.contentInset = UIEdgeInsetsMake(-sectionHeaderHeight, 0, 0, 0)
                 self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(1.0)
             }
+            
         } else {
         
             //different scrollview is scrolling
             print("do other things")
         }
-
+        
     }
 }
