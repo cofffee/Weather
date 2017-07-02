@@ -18,17 +18,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        window = UIWindow(frame: UIScreen.main.bounds)
+        let stuff = NetworkHandler(zip: "19143")
+        stuff.request()
         
+        window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = UIColor.white
         
-        coretab = CoreTabBarViewController()
-        window?.rootViewController = coretab
+        let thirdVC = WeatherPageViewController()
+        thirdVC.view.backgroundColor = UIColor.yellow.withAlphaComponent(0.2)
+        
+//        coretab = CoreTabBarViewController()
+        window?.rootViewController = thirdVC
         self.window?.makeKeyAndVisible()
 //        printFonts()
         
-        let stuff = NetworkHandler(zip: "78751")
-        stuff.request()
         
         return true
     }

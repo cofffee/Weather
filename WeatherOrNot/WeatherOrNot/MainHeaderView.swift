@@ -69,11 +69,23 @@ class MainHeaderView: UIView {
         addSubview(temperatureHighLowLabel!)
         
     }
+    func setLabelTexts(weather: Weather?) {
+        if weather != nil {
+            weatherLabel?.text = weather?.weatherArray.first?.main
+            temparatureLabel?.text = "\(Temperature(kelvin: (weather?.weatherMain?.temp)!).fahrenheit!)°"
+                //Temperature().kelvToFahr(kelvin: weather?.weatherMain?.temp)
+            cityNameLabel?.text = weather?.cityName
+            
+            let highTemp:String? = Temperature(kelvin: (weather?.weatherMain?.temp_max)!).fahrenheit
 
+            let lowTemp:String? = Temperature(kelvin: (weather?.weatherMain?.temp_min)!).fahrenheit
+            temperatureHighLowLabel?.text = "\(highTemp!)°/\(lowTemp!)°"
+        }
+    }
     /*
     // Only override draw() if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
+    override func draw(_ rect: CGRect) { 
         // Drawing code
     }
     */

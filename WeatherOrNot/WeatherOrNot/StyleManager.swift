@@ -21,7 +21,7 @@ class StyleManager {
         switch user.sex! {
         case Gender.Male:
             print("Male fork")
-            todaysOutfit = chooseDudeClothes(weather: weather)
+//            todaysOutfit = chooseDudeClothes(weather: weather)
         case Gender.Female:
             print("Female fork")
             todaysOutfit = chooseLadyClothes(weather: weather)
@@ -34,8 +34,8 @@ class StyleManager {
         return todaysOutfit
     }
     
-    func chooseDudeClothes(weather: Weather) -> Outfit {
-        var dudeFit: Outfit!
+//    func chooseDudeClothes(weather: Weather) -> Outfit {
+//        var dudeFit: Outfit!
         
 //        if let temp = Double(weather.temperature.fahrenheit) {
 //            if temp > 70 {
@@ -44,9 +44,9 @@ class StyleManager {
 //            }
 //        }
 
-        
-        return dudeFit
-    }
+//        
+//        return dudeFit
+//    }
     func chooseLadyClothes(weather: Weather) -> Outfit {
         let ladyFit: Outfit = Outfit()
         return ladyFit

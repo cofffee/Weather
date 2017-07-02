@@ -17,6 +17,8 @@ enum WeatherAPIType: String {
 class NetworkHandler {
     var weather: Weather? = nil
     
+    //let sharedInstance = NetworkHandler(zip: "19143")
+    
     var requestString: String = ""
     var apiID: String = "9575400c8412cb658faf53b4a3f44f82"
     var weatherAPICallType: WeatherAPIType = .weather
@@ -44,8 +46,10 @@ class NetworkHandler {
                 
                 let json = JSON(data: data)
                 self.weather = Weather(json: json)
+                WeatherCache.sharedInstance.weatherCacheList["\(self.weather?.cityName ?? "")"] = Weather(json: json)
 //                if let userName = json[0]["user"]["name"].string {
 //                    //Now you got your value
+//                print("\(WeatherCache.sharedInstance.weatherCacheList["Austin"]?.weatherMai ?? "yup")")
 //                }
             }
         }

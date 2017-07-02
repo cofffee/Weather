@@ -17,7 +17,8 @@ class Weather {
     var weatherMain: WeatherMain? = nil
     var cityName: String? = nil
     var weatherArray: [WeatherWeather] = [WeatherWeather]()
-    
+    var clouds: Clouds? = nil
+    var system: Sys? = nil
     var timeStamp: Int? = nil
 
 //    var humidity: String
@@ -37,6 +38,9 @@ class Weather {
         for jsonObj in json["weather"].arrayValue {
             weatherArray.append(WeatherWeather(json: jsonObj))
         }
+        clouds = Clouds(json: json["clouds"])
+        system = Sys(json: json["sys"])
+        
         timeStamp = json["dt"].int
     }
 
@@ -70,11 +74,11 @@ class Temperature {
     }
     func kelvToFahr(kelvin: Double) -> String {
         let fahrenheit = (9/5) * kelvin - Temperature.kelvinfahrenheitConversionConstant
-        return String(format:"%.2f", fahrenheit)
+        return String(format:"%.0f", fahrenheit)
     }
     func kelvToCelc(kelvin: Double) -> String {
         let celsius = kelvin - Temperature.kelvincelsiusConversionConstant
-        return String(format:"%.2f", celsius)
+        return String(format:"%.0f", celsius)
     }
     
 }
@@ -97,26 +101,6 @@ public class LocationCoordinates: NSObject {
     
 }
 
-public class WeatherWeather: NSObject {
-    var id: Double? = nil
-    var main: String? = nil
-    var desc: String? = nil
-    var icon: String? = nil
-    
-    override init () {
-        
-    }
-    init(json: JSON) {
-        super.init()
-        map(json: json)
-    }
-    func map(json: JSON) {
-        id = json["id"].double
-        main = json["main"].string
-        desc = json["description"].string
-        icon = json["icon"].string
-    }
-}
 public class WeatherMain: NSObject {
     
     var temp: Double? = 0
@@ -142,8 +126,60 @@ public class WeatherMain: NSObject {
         temp_max = json["temp_max"].double
     }
 }
-
-
+public class WeatherWeather: NSObject {
+    var id: Double? = nil
+    var main: String? = nil
+    var desc: String? = nil
+    var icon: String? = nil
+    
+    override init () {
+        
+    }
+    init(json: JSON) {
+        super.init()
+        map(json: json)
+    }
+    func map(json: JSON) {
+        id = json["id"].double
+        main = json["main"].string
+        desc = json["description"].string
+        icon = json["icon"].string
+    }
+}
+public class Clouds: NSObject {
+    //cloudiness by percent
+    var all: Double? = nil
+    
+    override init () {
+    }
+    init(json: JSON) {
+        super.init()
+        map(json: json)
+    }
+    func map(json: JSON) {
+        all = json["all"].double
+    }
+}
+public class Sys: NSObject {
+    var id: Double? = nil
+    var country: String? = nil
+    var sunrise: Double? = nil
+    var sunset: Double? = nil
+    
+    override init () {
+        
+    }
+    init(json: JSON) {
+        super.init()
+        map(json: json)
+    }
+    func map(json: JSON) {
+        id = json["id"].double
+        country = json["country"].string
+        sunrise = json["sunrise"].double
+        sunset = json["sunset"].double
+    }
+}
 
 
 

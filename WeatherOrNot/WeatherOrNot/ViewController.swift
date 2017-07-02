@@ -16,6 +16,21 @@ enum mainTableCellType: String {
 
 class ViewController: UIViewController {
     
+    func fetchNewWeatherFromZip() -> Void {
+        goButton?.setTitleColor(UIColor.gray, for: .normal)
+        if zipTextField?.text != nil && zipTextField?.text != "" {
+            print("Tapped search for zip: \(zipTextField?.text! ?? "nil!")")
+            print("Make the request")
+            print("reload table!")
+        }
+    }
+    var highestSoFar:Float = 0.0
+    var aWeather: Weather? {
+        didSet {
+            mainScreenTableView?.reloadData()
+        }
+    }
+    
     //*******pull down refresh attributes*******//
     var timer = Timer()
     lazy var reloadControl: UIRefreshControl = {
@@ -39,9 +54,12 @@ class ViewController: UIViewController {
     
     func handleRefresh(refreshControl: UIRefreshControl) {
         mainScreenTableView?.reloadData()
-        runTimer()
+        aWeather = WeatherCache.sharedInstance.weatherCacheList["Philadelphia"]
+        reloadControl.endRefreshing()
+//        runTimer()
     }
     func runTimer() {
+        aWeather = WeatherCache.sharedInstance.weatherCacheList["Philadelphia"]
         timer = Timer.scheduledTimer(timeInterval: 5, target: self,   selector: (#selector(ViewController.endRefresh)), userInfo: nil, repeats: false)
     }
     func endRefresh() {
@@ -59,12 +77,28 @@ class ViewController: UIViewController {
     var headerOpacity: CGFloat? = 1.0
     var topTableHeaderView: MainHeaderView? = nil
 
+    var zipTextField: UITextField? = nil
+    var goButton: UIButton? = nil
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let zipTextFrame = CGRect(x: 8, y: 8, width: view.frame.width - 55, height: 32)
+        zipTextField = UITextField(frame: zipTextFrame)
+        zipTextField?.placeholder = "Zip Code"
+        zipTextField?.backgroundColor = UIColor.red.withAlphaComponent(0.3)
+        zipTextField?.borderStyle = .roundedRect
+
+        view.addSubview(zipTextField!)
+        
+        let goButtonFrame = CGRect(x: view.frame.width - 40, y: 8, width: 24, height: 32)
+        goButton = UIButton(frame: goButtonFrame)
+        goButton?.setTitle("Go", for: .normal)
+        goButton?.setTitleColor(UIColor.blue, for: .normal)
+        goButton?.addTarget(self, action: (#selector(ViewController.fetchNewWeatherFromZip)), for: .touchUpInside)
+        view.addSubview(goButton!)
         
         
-        let mainScreenTableViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height - 44.0)
+        let mainScreenTableViewFrame = CGRect(x: 0, y: 50, width: view.frame.width, height: view.frame.height - 50)
 //        tabViewController.tabBar.frame.size.height
         mainScreenTableView = UITableView(frame: mainScreenTableViewFrame)
         mainScreenTableView?.delegate = self
@@ -77,7 +111,8 @@ class ViewController: UIViewController {
         
         reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes)
         mainScreenTableView?.addSubview(reloadControl)
-        mainScreenTableView?.alwaysBounceVertical = true
+//        mainScreenTableView?.contentInset.top = 100
+        
         
         view.addSubview(mainScreenTableView!)
         
@@ -103,9 +138,16 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 2
+    }
     //# OF ROWS
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return 0
+        }
         return 12
+        
     }
     
     //CELLS!
@@ -148,6 +190,9 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     //HMM SECTIONS!
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0{
+            return 0
+        }
         return goldenRatio * view.frame.height
     }
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
@@ -155,10 +200,20 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     //HEADER
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let topViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: goldenRatio * view.frame.height)
-        topTableHeaderView = MainHeaderView(frame: topViewFrame)
-        topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(0.0)
-        return topTableHeaderView
+        
+        if section != 0{
+            let topViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: goldenRatio * view.frame.height)
+            topTableHeaderView = MainHeaderView(frame: topViewFrame)
+            if aWeather != nil {
+                topTableHeaderView?.setLabelTexts(weather: self.aWeather)
+            }
+            topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(0.0)
+            
+            return topTableHeaderView
+        
+        }
+        return UIView()
+        
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("do something")
@@ -224,24 +279,26 @@ extension ViewController: UIScrollViewDelegate {
             let sectionHeaderHeight:CGFloat = goldenRatio * view.frame.height - 60
             //scroll down and up
 //            scrollView.alwaysBounceVertical = true
-            if scrollView.contentOffset.y <= sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
-                
+//            if scrollView.contentOffset.y < sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
+            if scrollView.contentOffset.y < sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
                 getOpacityFade(y: scrollView.contentOffset.y, x: sectionHeaderHeight)
-                
-                UIView.animate(withDuration: 0.2, delay: 0.1, options: [],
-                               animations: {
-                                self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(self.headerOpacity!)
-                                self.topTableHeaderView?.weatherImage?.alpha = 1 - self.headerOpacity!
-                }, 
-                               completion: nil
-                )
-                
+                topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(self.headerOpacity!)
+                topTableHeaderView?.weatherImage?.alpha = 1 - self.headerOpacity!
+//                topTableHeaderView?.frame.size.height = (topTableHeaderView?.frame.size.height)! - scrollView.contentOffset.y
                 print("scroll view content offset\(-scrollView.contentOffset.y)")
-                scrollView.contentInset = UIEdgeInsetsMake(-scrollView.contentOffset.y, 0, 0, 0)
+                let scrollFrame = scrollView.frame
+                //scrollView.frame = CGRect(x: 0, y: scrollFrame.origin.y - scrollView.contentOffset.y, width: view.frame.width, height: view.frame.height)
+        
+                scrollView.contentInset.top = -scrollView.contentOffset.y
+            
+                //scrollView.contentInset.top = -scrollView.contentOffset.y
                 
-            } else if scrollView.contentOffset.y >= sectionHeaderHeight {
-//                print("section header height \(-sectionHeaderHeight)")
-                scrollView.contentInset = UIEdgeInsetsMake(-sectionHeaderHeight, 0, 0, 0)
+                
+            } else if scrollView.contentOffset.y > sectionHeaderHeight {
+                print("section header height \(-sectionHeaderHeight)")
+               scrollView.contentInset.top = -sectionHeaderHeight
+        
+                
                 self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(1.0)
             }
             

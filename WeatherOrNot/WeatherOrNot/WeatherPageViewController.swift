@@ -11,7 +11,7 @@ import UIKit
 
 class WeatherPageViewController: UIPageViewController {
     private(set) lazy var orderedViewControllers: [UIViewController] = {
-        return [ViewController(), SecondViewController(), ViewController()]
+        return [ViewController(), ViewController(), ViewController()]
     }()
 
     override init(transitionStyle style: UIPageViewControllerTransitionStyle, navigationOrientation: UIPageViewControllerNavigationOrientation, options: [String : Any]? = nil) {

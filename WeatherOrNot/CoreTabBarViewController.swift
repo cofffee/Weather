@@ -34,6 +34,8 @@ class CoreTabBarViewController: UITabBarController {
         
         let vcs = [ firstVC, secondVC, thirdVC ]
         viewControllers = vcs
+        
+//        firstVC.aWeather = 
     }
 
     override func didReceiveMemoryWarning() {
