@@ -313,7 +313,25 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "forecastcell", for: indexPath as IndexPath) as? ForecastCollectionViewCell
-        cell?.weatherLabel?.text = "sunny as f*ck"
+        if aForecast != nil {
+            cell?.weatherLabel?.text = "\(aForecast!.forecastArray[indexPath.row].weatherArray.first!.desc!)"
+            
+            let unixTimestamp = aForecast!.forecastArray[indexPath.row].dt!
+            let date = Date(timeIntervalSince1970: TimeInterval(unixTimestamp))
+            let dateFormatter = DateFormatter()
+            dateFormatter.locale = NSLocale.current
+            dateFormatter.dateFormat = "M/d , h a" //Specify your format that you want
+            let strDate = dateFormatter.string(from: date)
+            cell?.timeLabel?.text = "\(strDate)"
+            
+            let temp = Temperature(kelvin: aForecast!.forecastArray[indexPath.row].main!.temp!)
+            cell?.tempLabel?.text = "\(temp.fahrenheit!)°"
+            
+            cell?.highLowTempLabel?.text = "10°/10°"
+            cell?.weatherImage!.image = UIImage(named: WeatherIcons.cloudy.name())
+            
+        }
+        
         let modRow = indexPath.row % 4
         switch modRow {
         case 0:

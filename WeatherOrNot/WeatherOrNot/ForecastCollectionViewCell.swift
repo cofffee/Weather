@@ -23,6 +23,7 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         weatherLabel?.font = UIFont(name: "PingFangTC-Light", size: 15)
         weatherLabel?.textColor = UIColor.white
         weatherLabel?.textAlignment = .center
+        weatherLabel?.lineBreakMode = .byCharWrapping
         
         let timeLabelFrame = CGRect(x: 0, y: 28 , width: frame.size.width, height: 18)
         timeLabel = UILabel(frame: timeLabelFrame)
@@ -36,6 +37,7 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         tempLabel?.font = UIFont(name: "PingFangTC-Light", size: 48)
         tempLabel?.textColor = UIColor.white
         tempLabel?.textAlignment = .center
+        tempLabel?.lineBreakMode = .byCharWrapping
         tempLabel?.text = "80°"
         
         let weatherImageFrame: CGRect = CGRect(x: (0.5) * frame.width - (0.5) * 65, y: frame.size.height - 74, width: 65, height: 65)
