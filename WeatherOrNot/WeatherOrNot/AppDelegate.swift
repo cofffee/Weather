@@ -22,11 +22,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = UIColor.white
         
+        let secondVC: SecondViewController = SecondViewController()
+        
         let thirdVC = WeatherPageViewController()
         thirdVC.view.backgroundColor = UIColor.yellow.withAlphaComponent(0.2)
         
 //        coretab = CoreTabBarViewController()
-        window?.rootViewController = thirdVC
+        window?.rootViewController = secondVC
         self.window?.makeKeyAndVisible()
 //        printFonts()
         

@@ -272,7 +272,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             if aWeather != nil {
                 topTableHeaderView?.setLabelTexts(weather: self.aWeather)
             }
-            topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(0.0)
+        
             
             return topTableHeaderView
     }
@@ -371,7 +371,8 @@ extension ViewController: UIScrollViewDelegate {
             if scrollView.contentOffset.y < sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
                 
                 getOpacityFade(y: scrollView.contentOffset.y, x: sectionHeaderHeight)
-                topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(self.headerOpacity!)
+                topTableHeaderView?.backgroundColor = AppUtility.sharedInstance.getRandomColor().withAlphaComponent(self.headerOpacity!)
+                //UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(self.headerOpacity!)
                 topTableHeaderView?.weatherImage?.alpha = 1 - self.headerOpacity!
                 
                 print("scroll view content offset\(-scrollView.contentOffset.y)")
@@ -383,7 +384,8 @@ extension ViewController: UIScrollViewDelegate {
                 print("section header height \(-sectionHeaderHeight)")
                 scrollView.contentInset.top = -sectionHeaderHeight
                 
-                self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(1.0)
+                topTableHeaderView?.backgroundColor = AppUtility.sharedInstance.getRandomColor().withAlphaComponent(self.headerOpacity!)
+//                self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(1.0)
             }
             
         } else {
