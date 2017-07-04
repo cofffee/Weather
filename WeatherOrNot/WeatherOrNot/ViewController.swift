@@ -83,13 +83,17 @@ class ViewController: UIViewController {
     }
     
     var highestSoFar:Float = 0.0
-    var aForecast: Forecast? = nil
+    
     var aWeather: Weather? {
         didSet {
             mainScreenTableView?.reloadData()
         }
     }
-    
+    var aForecast: Forecast? {
+        didSet {
+            mainScreenTableView?.reloadData()
+        }
+    }
     //*******pull down refresh attributes*******//
     var timer: Timer? = nil
     lazy var reloadControl: UIRefreshControl = {
@@ -141,6 +145,7 @@ class ViewController: UIViewController {
         zipTextField?.backgroundColor = UIColor.red.withAlphaComponent(0.3)
         zipTextField?.borderStyle = .roundedRect
         zipTextField?.delegate = self
+
         
         view.addSubview(zipTextField!)
         
@@ -190,11 +195,15 @@ class ViewController: UIViewController {
 
 }
 extension ViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField!) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         textField.resignFirstResponder()  //if desired
         fetchNewWeatherFromZip()
         return true
+    }
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+        
     }
 }
 
@@ -258,7 +267,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     //HEADER
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
-//        if section != 0{
             let topViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: goldenRatio * view.frame.height)
             topTableHeaderView = MainHeaderView(frame: topViewFrame)
             if aWeather != nil {
@@ -267,10 +275,6 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             topTableHeaderView?.backgroundColor = UIColor.yellow.withAlphaComponent(0.0)
             
             return topTableHeaderView
-        
-//        }
-//        return UIView()
-        
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("do something")
@@ -298,27 +302,33 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         //dataArray[collectionView.tag].count
+        if aForecast != nil {
+            if aForecast!.count! > 0 {
+                return aForecast!.count!
+            }
+        }
         return 12
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "forecastcell", for: indexPath as IndexPath) as? ForecastCollectionViewCell
+        cell?.weatherLabel?.text = "sunny as f*ck"
         let modRow = indexPath.row % 4
         switch modRow {
         case 0:
-            cell.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0)
+            cell?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0)
         case 1:
-            cell.backgroundColor = UIColor(red: 242/255, green: 226/255, blue: 151/255, alpha: 1.0)
+            cell?.backgroundColor = UIColor(red: 242/255, green: 226/255, blue: 151/255, alpha: 1.0)
         case 2:
-            cell.backgroundColor = UIColor(red: 137/255, green: 181/255, blue: 218/255, alpha: 1.0)
+            cell?.backgroundColor = UIColor(red: 137/255, green: 181/255, blue: 218/255, alpha: 1.0)
         case 3:
-            cell.backgroundColor = UIColor(red: 97/255, green: 213/255, blue: 212/255, alpha: 1.0)
+            cell?.backgroundColor = UIColor(red: 97/255, green: 213/255, blue: 212/255, alpha: 1.0)
         default:
             print("How did you get here")
         }
         
-        return cell
+        return cell!
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         return CGSize(width: 100.0, height: 160.0)
@@ -335,26 +345,20 @@ extension ViewController: UIScrollViewDelegate {
         if scrollView.tag == 1234 {
             let sectionHeaderHeight:CGFloat = goldenRatio * view.frame.height - 60
             //scroll down and up
-//            scrollView.alwaysBounceVertical = true
-//            if scrollView.contentOffset.y < sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
             if scrollView.contentOffset.y < sectionHeaderHeight && scrollView.contentOffset.y >= 0 {
+                
                 getOpacityFade(y: scrollView.contentOffset.y, x: sectionHeaderHeight)
                 topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(self.headerOpacity!)
                 topTableHeaderView?.weatherImage?.alpha = 1 - self.headerOpacity!
-//                topTableHeaderView?.frame.size.height = (topTableHeaderView?.frame.size.height)! - scrollView.contentOffset.y
+                
                 print("scroll view content offset\(-scrollView.contentOffset.y)")
-                let scrollFrame = scrollView.frame
-                //scrollView.frame = CGRect(x: 0, y: scrollFrame.origin.y - scrollView.contentOffset.y, width: view.frame.width, height: view.frame.height)
-        
                 scrollView.contentInset.top = -scrollView.contentOffset.y
-            
-                //scrollView.contentInset.top = -scrollView.contentOffset.y
                 
                 
             } else if scrollView.contentOffset.y > sectionHeaderHeight {
+                
                 print("section header height \(-sectionHeaderHeight)")
-               scrollView.contentInset.top = -sectionHeaderHeight
-        
+                scrollView.contentInset.top = -sectionHeaderHeight
                 
                 self.topTableHeaderView?.backgroundColor = UIColor(red: 242/255, green: 122/255, blue: 85/255, alpha: 1.0).withAlphaComponent(1.0)
             }

@@ -9,6 +9,32 @@
 import Foundation
 import SwiftyJSON
 
+class Forecast {
+    
+    var city: City? = nil
+    var weatherLocationCoordinate: LocationCoordinates? = nil
+    var weatherMain: WeatherMain? = nil
+    var countryName: String? = nil
+    var code: String? = nil
+    var count: Int? = 0
+    var forecastArray: [ForecastForecast] = [ForecastForecast]()
+    
+    
+    init() {}
+    init(json:JSON) {
+        city = City(json: json["city"])
+        weatherLocationCoordinate = LocationCoordinates(json: json["coord"])
+        countryName = json["country"].string
+        code = json["cod"].string
+        count = json["cnt"].int
+        
+        for jsonObj in json["list"].arrayValue {
+            forecastArray.append(ForecastForecast(json: jsonObj))
+        }
+        
+    }
+}
+
 class City {
     var id: Int? = 0
     var name: String? = ""
@@ -72,28 +98,4 @@ class MainForecast {
         humidity = json["humidity"].int
     }
 }
-class Forecast {
-    
-    var city: City? = nil
-    var weatherLocationCoordinate: LocationCoordinates? = nil
-    var weatherMain: WeatherMain? = nil
-    var countryName: String? = nil
-    var code: String? = nil
-    var count: Int? = 0
-    var forecastArray: [ForecastForecast] = [ForecastForecast]()
-    
 
-    init() {}
-    init(json:JSON) {
-        city = City(json: json["city"])
-        weatherLocationCoordinate = LocationCoordinates(json: json["coord"])
-        countryName = json["country"].string
-        code = json["cod"].string
-        count = json["cnt"].int
-        
-        for jsonObj in json["list"].arrayValue {
-            forecastArray.append(ForecastForecast(json: jsonObj))
-        }
-
-    }
-}

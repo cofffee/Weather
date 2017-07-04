@@ -14,8 +14,8 @@ enum WeatherAPIType: String {
     case weather
     case forecast
 }
-typealias CompletionHandler = (_ available:Weather) -> Void
-typealias Completionhandler = (_ ready:Forecast) -> Void
+typealias WeatherCompletion = (_ available:Weather) -> Void
+typealias ForecastCompletion = (_ ready:Forecast) -> Void
 
 class NetworkHandler {
     
@@ -35,8 +35,8 @@ class NetworkHandler {
     }
     
     
-    func request(completion: @escaping CompletionHandler) {
-        //print("\()")
+    func request(completion: @escaping WeatherCompletion) {
+    
         Alamofire.request(requestString).responseJSON { response in
             print("Request: \(String(describing: response.request))")   // original url request
             print("Response: \(String(describing: response.response))") // http url response
@@ -53,7 +53,7 @@ class NetworkHandler {
                 )}
         }
     }
-    func requestForecast(completion: @escaping Completionhandler) {
+    func requestForecast(completion: @escaping ForecastCompletion) {
         //print("\()")
         let forecastRequest = "http://api.openweathermap.org/data/2.5/\(self.a.rawValue)?zip=\(self.zip ?? "19143"),us&appid=\(self.apiID)"
         Alamofire.request(forecastRequest).responseJSON { response in

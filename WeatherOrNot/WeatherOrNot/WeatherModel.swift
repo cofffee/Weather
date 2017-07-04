@@ -11,7 +11,6 @@ import SwiftyJSON
 
 class Weather {
 
-
     var weatherLocationCoordinate: LocationCoordinates? = nil
     var weatherMain: WeatherMain? = nil
     var cityName: String? = nil
@@ -38,42 +37,7 @@ class Weather {
 
 }
 
-enum WeatherType: String {
-    case Sunny
-    case Rain
-    case Cloudy
-    case Windy
-    case Storm
-    case Snow
-    case Thunder
-    
-    case Weird
-    case Unknown
-    case HellStorm
-    case Texas
-}
 
-class Temperature {
-    var fahrenheit: String!
-    var celsius: String!
-    var kelvin: String!
-    
-    static let kelvinfahrenheitConversionConstant:Double = 459.67
-    static let kelvincelsiusConversionConstant:Double = 273.15
-    init (kelvin: Double) {
-        fahrenheit = kelvToFahr(kelvin: kelvin)
-        celsius = kelvToCelc(kelvin: kelvin)
-    }
-    func kelvToFahr(kelvin: Double) -> String {
-        let fahrenheit = (9/5) * kelvin - Temperature.kelvinfahrenheitConversionConstant
-        return String(format:"%.0f", fahrenheit)
-    }
-    func kelvToCelc(kelvin: Double) -> String {
-        let celsius = kelvin - Temperature.kelvincelsiusConversionConstant
-        return String(format:"%.0f", celsius)
-    }
-    
-}
 
 
 public class LocationCoordinates: NSObject {
@@ -174,6 +138,42 @@ public class Sys: NSObject {
 }
 
 
+enum WeatherType: String {
+    case Sunny
+    case Rain
+    case Cloudy
+    case Windy
+    case Storm
+    case Snow
+    case Thunder
+    
+    case Weird
+    case Unknown
+    case HellStorm
+    case Texas
+}
+
+class Temperature {
+    var fahrenheit: String!
+    var celsius: String!
+    var kelvin: String!
+    
+    static let kelvinfahrenheitConversionConstant:Double = 459.67
+    static let kelvincelsiusConversionConstant:Double = 273.15
+    init (kelvin: Double) {
+        fahrenheit = kelvToFahr(kelvin: kelvin)
+        celsius = kelvToCelc(kelvin: kelvin)
+    }
+    func kelvToFahr(kelvin: Double) -> String {
+        let fahrenheit = (9/5) * kelvin - Temperature.kelvinfahrenheitConversionConstant
+        return String(format:"%.0f", fahrenheit)
+    }
+    func kelvToCelc(kelvin: Double) -> String {
+        let celsius = kelvin - Temperature.kelvincelsiusConversionConstant
+        return String(format:"%.0f", celsius)
+    }
+    
+}
 
 //extension String {
 //    func removeTrailingZeros(number: String) -> String {

@@ -29,8 +29,10 @@ class ScrollableTableViewCell: UITableViewCell {
         layout.minimumLineSpacing = 0
         layout.scrollDirection = .horizontal
         
+
         
-        collectionView?.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        
+        collectionView?.register(ForecastCollectionViewCell.self, forCellWithReuseIdentifier: "forecastcell")
         
         contentView.addSubview(collectionView!)
         self.selectionStyle = .none
