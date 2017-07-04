@@ -19,7 +19,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let stuff = NetworkHandler(zip: "19143")
-        stuff.request()
+//        stuff.request(completion: <#CompletionHandler#>)
+        stuff.request(completion: { (available) -> Void in
+            
+            // When download completes,control flow goes here.
+            if available != nil {
+                // download success
+                //self.aWeather = available
+                print("Woor woor")
+            } else {
+                // download fail
+            }
+        })
+
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = UIColor.white

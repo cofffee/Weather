@@ -16,15 +16,74 @@ enum mainTableCellType: String {
 
 class ViewController: UIViewController {
     
-    func fetchNewWeatherFromZip() -> Void {
-        goButton?.setTitleColor(UIColor.gray, for: .normal)
-        if zipTextField?.text != nil && zipTextField?.text != "" {
-            print("Tapped search for zip: \(zipTextField?.text! ?? "nil!")")
-            print("Make the request")
-            print("reload table!")
+    func resetAPICallCount() {
+        APICallCountPerMinute = 4
+        timer?.invalidate()
+        timer = nil
+    }
+    func APICallCountFilter() {
+        APICallCountPerMinute -= 1
+        if APICallCountPerMinute <= 0 {
+            let alertController = UIAlertController(title: "Limit 4 calls per minute", message: "Chill for a minute", preferredStyle: .alert)
+            
+            let OKAction = UIAlertAction(title: "OK", style: .default) { action in
+                // ...
+            }
+            alertController.addAction(OKAction)
+            
+            self.present(alertController, animated: true) {
+                // ...
+            }
+            if timer == nil {
+                timer = Timer.scheduledTimer(timeInterval: 60, target: self,  selector: (#selector(ViewController.resetAPICallCount)), userInfo: nil, repeats: false)
+
+            }
+            //print("time left: \(timer?.timeInterval)")
         }
     }
+    func fetchForecast() -> Void  {
+        let net: NetworkHandler = NetworkHandler(zip: (zipTextField?.text!)!)
+        net.requestForecast(completion: { (ready) -> Void in
+            
+            // When download completes,control flow goes here.
+            if ready != nil {
+                // download success
+                self.aForecast = ready
+                self.goButton?.setTitleColor(UIColor.blue, for: .normal)
+            } else {
+                // download fail
+                print("oh word, no new shit")
+            }
+        })
+
+    }
+    func fetchNewWeatherFromZip() -> Void {
+        fetchForecast()
+        
+        goButton?.setTitleColor(UIColor.gray, for: .normal)
+        APICallCountFilter()
+        if zipTextField?.text != nil && zipTextField?.text != "" && APICallCountPerMinute > 0{
+            print("Tapped search for zip: \(zipTextField?.text! ?? "nil!")")
+            print("Make the request")
+            let net: NetworkHandler = NetworkHandler(zip: (zipTextField?.text!)!)
+            net.request(completion: { (available) -> Void in
+                
+                // When download completes,control flow goes here.
+                if available != nil {
+                    // download success
+                    self.aWeather = available
+                    self.goButton?.setTitleColor(UIColor.blue, for: .normal)
+                } else {
+                    // download fail
+                    print("oh word, no new shit")
+                }
+            })
+            
+        }
+    }
+    
     var highestSoFar:Float = 0.0
+    var aForecast: Forecast? = nil
     var aWeather: Weather? {
         didSet {
             mainScreenTableView?.reloadData()
@@ -32,7 +91,7 @@ class ViewController: UIViewController {
     }
     
     //*******pull down refresh attributes*******//
-    var timer = Timer()
+    var timer: Timer? = nil
     lazy var reloadControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
         refreshControl.backgroundColor = UIColor(red: 137/255, green: 181/255, blue: 218/255, alpha: 1.0)
@@ -42,7 +101,7 @@ class ViewController: UIViewController {
         return refreshControl
     }()
     
-    var pullRefreshTimeStamp:String?{
+    var pullRefreshTimeStamp:String? {
         
         return "Yo the time is 10:17!"
     }
@@ -54,18 +113,12 @@ class ViewController: UIViewController {
     
     func handleRefresh(refreshControl: UIRefreshControl) {
         mainScreenTableView?.reloadData()
-        aWeather = WeatherCache.sharedInstance.weatherCacheList["Philadelphia"]
-        reloadControl.endRefreshing()
-//        runTimer()
-    }
-    func runTimer() {
-        aWeather = WeatherCache.sharedInstance.weatherCacheList["Philadelphia"]
-        timer = Timer.scheduledTimer(timeInterval: 5, target: self,   selector: (#selector(ViewController.endRefresh)), userInfo: nil, repeats: false)
-    }
-    func endRefresh() {
+        
         reloadControl.endRefreshing()
     }
     //*******pull down refresh attributes*******//
+    
+    var APICallCountPerMinute: Int = 4
     
     let goldenRatio: CGFloat = 7 / 9
 //    var scrollView: UIScrollView! = nil
@@ -82,15 +135,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let zipTextFrame = CGRect(x: 8, y: 8, width: view.frame.width - 55, height: 32)
+        let zipTextFrame = CGRect(x: 8, y: 28, width: view.frame.width - 55, height: 32)
         zipTextField = UITextField(frame: zipTextFrame)
         zipTextField?.placeholder = "Zip Code"
         zipTextField?.backgroundColor = UIColor.red.withAlphaComponent(0.3)
         zipTextField?.borderStyle = .roundedRect
-
+        zipTextField?.delegate = self
+        
         view.addSubview(zipTextField!)
         
-        let goButtonFrame = CGRect(x: view.frame.width - 40, y: 8, width: 24, height: 32)
+        let goButtonFrame = CGRect(x: view.frame.width - 40, y: 28, width: 24, height: 32)
         goButton = UIButton(frame: goButtonFrame)
         goButton?.setTitle("Go", for: .normal)
         goButton?.setTitleColor(UIColor.blue, for: .normal)
@@ -98,8 +152,7 @@ class ViewController: UIViewController {
         view.addSubview(goButton!)
         
         
-        let mainScreenTableViewFrame = CGRect(x: 0, y: 50, width: view.frame.width, height: view.frame.height - 50)
-//        tabViewController.tabBar.frame.size.height
+        let mainScreenTableViewFrame = CGRect(x: 0, y: 70, width: view.frame.width, height: view.frame.height - 70)
         mainScreenTableView = UITableView(frame: mainScreenTableViewFrame)
         mainScreenTableView?.delegate = self
         mainScreenTableView?.dataSource = self
@@ -111,10 +164,10 @@ class ViewController: UIViewController {
         
         reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes)
         mainScreenTableView?.addSubview(reloadControl)
-//        mainScreenTableView?.contentInset.top = 100
         
         
         view.addSubview(mainScreenTableView!)
+        
         
         /*
 
@@ -136,16 +189,22 @@ class ViewController: UIViewController {
 
 
 }
+extension ViewController: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField!) -> Bool {
+        
+        textField.resignFirstResponder()  //if desired
+        fetchNewWeatherFromZip()
+        return true
+    }
+}
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return 1
     }
     //# OF ROWS
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if section == 0 {
-            return 0
-        }
+
         return 12
         
     }
@@ -190,9 +249,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     }
     //HMM SECTIONS!
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        if section == 0{
-            return 0
-        }
+
         return goldenRatio * view.frame.height
     }
     func tableView(_ tableView: UITableView, estimatedHeightForFooterInSection section: Int) -> CGFloat {
@@ -201,7 +258,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     //HEADER
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         
-        if section != 0{
+//        if section != 0{
             let topViewFrame = CGRect(x: 0, y: 0, width: view.frame.width, height: goldenRatio * view.frame.height)
             topTableHeaderView = MainHeaderView(frame: topViewFrame)
             if aWeather != nil {
@@ -211,8 +268,8 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             
             return topTableHeaderView
         
-        }
-        return UIView()
+//        }
+//        return UIView()
         
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

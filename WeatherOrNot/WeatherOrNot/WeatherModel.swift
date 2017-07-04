@@ -11,8 +11,7 @@ import SwiftyJSON
 
 class Weather {
 
-//    var weather: WeatherType
-//    var temperature: Temperature!
+
     var weatherLocationCoordinate: LocationCoordinates? = nil
     var weatherMain: WeatherMain? = nil
     var cityName: String? = nil
@@ -21,14 +20,7 @@ class Weather {
     var system: Sys? = nil
     var timeStamp: Int? = nil
 
-//    var humidity: String
-    
-//    init(wthr: WeatherType, temp: Temperature, humid: String) {
-//        self.weather = WeatherType(rawValue: wthr.rawValue)!
-//        self.temperature = temp
-//        self.humidity = humid
-//    
-//    }
+
     init() {}
     init(json:JSON) {
         weatherMain = WeatherMain(json: json["main"])
@@ -148,7 +140,7 @@ public class WeatherWeather: NSObject {
 }
 public class Clouds: NSObject {
     //cloudiness by percent
-    var all: Double? = nil
+    var all: Int? = nil
     
     override init () {
     }
@@ -157,7 +149,7 @@ public class Clouds: NSObject {
         map(json: json)
     }
     func map(json: JSON) {
-        all = json["all"].double
+        all = json["all"].int
     }
 }
 public class Sys: NSObject {
