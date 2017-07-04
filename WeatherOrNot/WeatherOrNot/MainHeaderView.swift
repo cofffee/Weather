@@ -71,6 +71,10 @@ class MainHeaderView: UIView {
     }
     func setLabelTexts(weather: Weather?) {
         if weather?.cityName != nil {
+            let id = weather?.weatherArray.first?.id!
+            let weatherIconString = Icons().getIconWith(code: id!)
+            weatherImage!.image = UIImage(named: weatherIconString)
+            
             weatherLabel?.text = weather?.weatherArray.first?.desc
             temparatureLabel?.text = "\(Temperature(kelvin: (weather?.weatherMain?.temp)!).fahrenheit!)°"
                 //Temperature().kelvToFahr(kelvin: weather?.weatherMain?.temp)

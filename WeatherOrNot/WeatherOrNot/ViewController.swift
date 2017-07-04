@@ -314,7 +314,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "forecastcell", for: indexPath as IndexPath) as? ForecastCollectionViewCell
         if aForecast != nil {
-            cell?.weatherLabel?.text = "\(aForecast!.forecastArray[indexPath.row].weatherArray.first!.desc!)"
+            cell?.weatherLabel?.text = "\(aForecast!.forecastArray[indexPath.row].weatherArray.first!.main!)"
             
             let unixTimestamp = aForecast!.forecastArray[indexPath.row].dt!
             let date = Date(timeIntervalSince1970: TimeInterval(unixTimestamp))
@@ -327,8 +327,13 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
             let temp = Temperature(kelvin: aForecast!.forecastArray[indexPath.row].main!.temp!)
             cell?.tempLabel?.text = "\(temp.fahrenheit!)°"
             
-            cell?.highLowTempLabel?.text = "10°/10°"
-            cell?.weatherImage!.image = UIImage(named: WeatherIcons.cloudy.name())
+            let highTemp = Temperature(kelvin: aForecast!.forecastArray[indexPath.row].main!.tempMax!)
+            let lowTemp = Temperature(kelvin: aForecast!.forecastArray[indexPath.row].main!.tempMin!)
+            cell?.highLowTempLabel?.text = "\(highTemp.fahrenheit!)°/\(lowTemp.fahrenheit!)°"
+            
+            let id = aForecast!.forecastArray[indexPath.row].weatherArray.first!.id!
+            let iconString = Icons().getIconWith(code: id)
+            cell?.weatherImage!.image = UIImage(named: iconString)
             
         }
         

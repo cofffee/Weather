@@ -7,7 +7,34 @@
 //
 
 import Foundation
+class Icons {
 
+    init() {}
+    func getIconWith(code: Double) -> String {
+        switch code {
+        case 200..<300:
+            return "Rain"
+        case 300..<400:
+            return "Rain"
+        case 400..<500:
+            return "CloudySun"
+        case 500..<600:
+            return "Rain"
+        case 600..<700:
+            return "Snow"
+        case 700..<800:
+            return "Tornado"
+        case 800:
+            return "Sun"
+        case 801..<900:
+            return "CloudySun"
+        case 900..<1000:
+            return "Tornado"
+        default:
+            return "Moon"
+        }
+    }
+}
 enum WeatherIcons: String {
 
     case cloudy
@@ -51,5 +78,4 @@ enum WeatherIcons: String {
             return "Rain"
         }
     }
-
 }
