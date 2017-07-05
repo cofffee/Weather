@@ -24,13 +24,14 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         weatherLabel?.textColor = UIColor.white
         weatherLabel?.textAlignment = .center
         weatherLabel?.lineBreakMode = .byCharWrapping
+        weatherLabel?.text = "-"
         
         let timeLabelFrame = CGRect(x: 0, y: 28 , width: frame.size.width, height: 18)
         timeLabel = UILabel(frame: timeLabelFrame)
         timeLabel?.font = UIFont(name: "PingFangTC-Light", size: 15)
         timeLabel?.textColor = UIColor.black
         timeLabel?.textAlignment = .center
-        timeLabel?.text = "3am"
+        timeLabel?.text = "Now"
         
         let tempLabelFrame = CGRect(x: 0, y: 48, width: frame.size.width, height: 50)
         tempLabel = UILabel(frame: tempLabelFrame)
@@ -38,7 +39,7 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         tempLabel?.textColor = UIColor.white
         tempLabel?.textAlignment = .center
         tempLabel?.lineBreakMode = .byCharWrapping
-        tempLabel?.text = "80°"
+        tempLabel?.text = "1"
         
         let weatherImageFrame: CGRect = CGRect(x: (0.5) * frame.width - (0.5) * 65, y: frame.size.height - 74, width: 65, height: 65)
         weatherImage = UIImageView(frame: weatherImageFrame)
@@ -49,7 +50,7 @@ class ForecastCollectionViewCell: UICollectionViewCell {
         highLowTempLabel?.font = UIFont(name: "PingFangTC-Light", size: 14)
         highLowTempLabel?.textColor = UIColor.white
         highLowTempLabel?.textAlignment = .center
-        highLowTempLabel?.text = "83°/76°"
+        highLowTempLabel?.text = "#°/#°"
         
         contentView.addSubview(weatherLabel!)
         contentView.addSubview(timeLabel!)

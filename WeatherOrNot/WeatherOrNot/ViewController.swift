@@ -35,7 +35,7 @@ class ViewController: UIViewController {
                 // ...
             }
             if timer == nil {
-                timer = Timer.scheduledTimer(timeInterval: 60, target: self,  selector: (#selector(ViewController.resetAPICallCount)), userInfo: nil, repeats: false)
+                timer = Timer.scheduledTimer(timeInterval: 20, target: self,  selector: (#selector(ViewController.resetAPICallCount)), userInfo: nil, repeats: false)
 
             }
             //print("time left: \(timer?.timeInterval)")
@@ -44,20 +44,23 @@ class ViewController: UIViewController {
     func fetchForecast() -> Void  {
         let net: NetworkHandler = NetworkHandler(zip: (zipTextField?.text!)!)
         net.requestForecast(completion: { (ready) -> Void in
-            
+
+            self.aForecast = ready
+            self.goButton?.setTitleColor(UIColor.blue, for: .normal)
             // When download completes,control flow goes here.
-            if ready != nil {
-                // download success
-                self.aForecast = ready
-                self.goButton?.setTitleColor(UIColor.blue, for: .normal)
-            } else {
-                // download fail
-                print("oh word, no new shit")
-            }
+//            if ready != nil {
+//                // download success
+//                self.aForecast = ready
+//                self.goButton?.setTitleColor(UIColor.blue, for: .normal)
+//            } else {
+//                // download fail
+//                print("oh word, no new shit")
+//            }
         })
 
     }
     func fetchNewWeatherFromZip() -> Void {
+        zipTextField?.resignFirstResponder()
         fetchForecast()
         
         goButton?.setTitleColor(UIColor.gray, for: .normal)
@@ -68,15 +71,17 @@ class ViewController: UIViewController {
             let net: NetworkHandler = NetworkHandler(zip: (zipTextField?.text!)!)
             net.request(completion: { (available) -> Void in
                 
+                self.aWeather = available
+                self.goButton?.setTitleColor(UIColor.blue, for: .normal)
                 // When download completes,control flow goes here.
-                if available != nil {
-                    // download success
-                    self.aWeather = available
-                    self.goButton?.setTitleColor(UIColor.blue, for: .normal)
-                } else {
-                    // download fail
-                    print("oh word, no new shit")
-                }
+//                if available != nil {
+//                    // download success
+//                    self.aWeather = available
+//                    self.goButton?.setTitleColor(UIColor.blue, for: .normal)
+//                } else {
+//                    // download fail
+//                    print("oh word, no new shit")
+//                }
             })
             
         }
@@ -167,7 +172,7 @@ class ViewController: UIViewController {
         mainScreenTableView?.register(LongTableViewCell.self, forCellReuseIdentifier: "longcell")
         mainScreenTableView!.tag = 1234
         
-        reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes)
+        reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes ?? nil)
         mainScreenTableView?.addSubview(reloadControl)
         
         
@@ -232,7 +237,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
                 return cell
             }
         default:
-            UITableViewCell()
+            print("Woops idk")
         }
 
         
@@ -320,7 +325,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
             let date = Date(timeIntervalSince1970: TimeInterval(unixTimestamp))
             let dateFormatter = DateFormatter()
             dateFormatter.locale = NSLocale.current
-            dateFormatter.dateFormat = "M/d , h a" //Specify your format that you want
+            dateFormatter.dateFormat = "E, h a" //Specify your format that you want
             let strDate = dateFormatter.string(from: date)
             cell?.timeLabel?.text = "\(strDate)"
             
