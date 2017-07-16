@@ -14,7 +14,13 @@ enum mainTableCellType: String {
     case Long
 }
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
+    
+    var headerView: MainHeaderView? = nil
+    
+    let maxHeaderHeight: CGFloat = 380
+    let minHeaderHeight: CGFloat = 70
+    var previousScrollOffset: CGFloat = 0.0
     
     func resetAPICallCount() {
         APICallCountPerMinute = 4
@@ -92,6 +98,9 @@ class ViewController: UIViewController {
     var aWeather: Weather? {
         didSet {
             mainScreenTableView?.reloadData()
+            if headerView != nil {
+                headerView?.setLabelTexts(weather: aWeather)
+            }
         }
     }
     var aForecast: Forecast? {
@@ -139,17 +148,17 @@ class ViewController: UIViewController {
     var headerOpacity: CGFloat? = 1.0
     var topTableHeaderView: MainHeaderView? = nil
 
-    var zipTextField: UITextField? = nil
+    var zipTextField: ShakingTextField? = nil
     var goButton: UIButton? = nil
     override func viewDidLoad() {
         super.viewDidLoad()
         
         let zipTextFrame = CGRect(x: 8, y: 28, width: view.frame.width - 55, height: 32)
-        zipTextField = UITextField(frame: zipTextFrame)
+        zipTextField = ShakingTextField(frame: zipTextFrame)
         zipTextField?.placeholder = "Zip Code"
         zipTextField?.backgroundColor = UIColor.red.withAlphaComponent(0.3)
         zipTextField?.borderStyle = .roundedRect
-        zipTextField?.delegate = self
+        zipTextField?.delegate = self as? UITextFieldDelegate
 
         
         view.addSubview(zipTextField!)
@@ -162,65 +171,65 @@ class ViewController: UIViewController {
         view.addSubview(goButton!)
         
         
-        let mainScreenTableViewFrame = CGRect(x: 0, y: 70, width: view.frame.width, height: view.frame.height - 70)
+        let mainScreenTableViewFrame = CGRect(x: 0, y: 450, width: view.frame.width, height: view.frame.height - 450)
         mainScreenTableView = UITableView(frame: mainScreenTableViewFrame)
-        mainScreenTableView?.delegate = self
-        mainScreenTableView?.dataSource = self
+        mainScreenTableView?.delegate = self as? UITableViewDelegate
+        mainScreenTableView?.dataSource = self as? UITableViewDataSource
         
         mainScreenTableView?.register(ScrollableTableViewCell.self, forCellReuseIdentifier: "scrollablecell")
 
         mainScreenTableView?.register(LongTableViewCell.self, forCellReuseIdentifier: "longcell")
         mainScreenTableView!.tag = 1234
         
-        reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes ?? nil)
+        reloadControl.attributedTitle = NSAttributedString(string: pullRefreshTimeStamp!, attributes: pullDownfontAttributes )
         mainScreenTableView?.addSubview(reloadControl)
         
         
         view.addSubview(mainScreenTableView!)
         
-        
-        /*
+        setUpViews()
+    
 
-        
-        let myTemp = Temperature(kelvin: 291.483)
-        myWeather = Weather(wthr: WeatherType.Texas, temp: myTemp, humid: "43%")
-        
-        print(myWeather?.temperature.celsius ?? "")
-        print(myWeather?.temperature.fahrenheit ?? "")
-        
-        let aString = "hello"
-        
-        let a = aString.removeTrailingZeros(number: "hello")
-        print(a)
-
-         */
     }
-
-
-
-}
-extension ViewController: UITextFieldDelegate {
+    func setUpViews() -> Void{
+        let headerFrame = CGRect(x: 0, y: 70, width: view.frame.width, height: 380)
+        headerView = MainHeaderView(frame: headerFrame)
+        headerView?.backgroundColor = AppUtility.sharedInstance.getRandomColor()
+        
+        view.addSubview(headerView!)
+        
+    }
+    func getWeather() {
+        let weatherRouter: Router = Router.Weather
+        NetworkHandler.sharedInstance.request(request: weatherRouter, success: { [unowned self] (jsonObject, httpResponse) -> Void in
+            if let json = jsonObject {
+                let weatherObj = Weather(json:json)
+                self.aWeather = weatherObj
+            }
+            
+            })
+        { (errorString, httpResponse) -> Void in
+            
+        }
+    }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
-        textField.resignFirstResponder()  //if desired
-        fetchNewWeatherFromZip()
-        return true
-    }
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
-        
+        fetchNewWeatherFromZip()
+        return false
+    }
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        zipTextField?.shake()
+    }
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextFieldDidEndEditingReason) {
+        zipTextField?.stopShake()
     }
 }
-
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    //# OF ROWS
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-
-        return 12
-        
+        return 10
     }
     
     //CELLS!
@@ -234,6 +243,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             }
         case 1:
             if let cell = tableView.dequeueReusableCell(withIdentifier: "longcell", for: indexPath) as? LongTableViewCell {
+                cell.backgroundColor = AppUtility.sharedInstance.getRandomColor()
                 return cell
             }
         default:
@@ -261,7 +271,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         }
 //        return 160
     }
-    //HMM SECTIONS!
+    /*
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
 
         return goldenRatio * view.frame.height
@@ -281,6 +291,7 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
             
             return topTableHeaderView
     }
+    */
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("do something")
 
@@ -301,14 +312,62 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
         footerView.backgroundColor = UIColor.red.withAlphaComponent(0.3)
         return footerView
     }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if canAnimateHeader(scrollView) {
+            
+            let absoluteTop: CGFloat = 0
+            let absoluteBottom: CGFloat = scrollView.contentSize.height - scrollView.frame.size.height
+            
+            let scrollDiff = scrollView.contentOffset.y - previousScrollOffset
+            
+            let isScrollingDown = scrollDiff > 0 && scrollView.contentOffset.y > absoluteTop
+            let isScrollingUp = scrollDiff < 0 && scrollView.contentOffset.y < absoluteBottom
+            
+            var newHeight = headerView?.frame.height
+            if isScrollingDown {
+                newHeight = max(self.minHeaderHeight, (headerView?.frame.height)! - abs(scrollDiff))
+                print("Down")
+            } else if isScrollingUp {
+                newHeight = min(self.maxHeaderHeight, (headerView?.frame.height)! + abs(scrollDiff))
+                print("Up")
+            }
+            
+            if newHeight != headerView?.frame.height {
+                
+                headerView?.frame.size.height = newHeight!
+//                headerView?.temparatureLabel?.frame.size.height = headerView!.temparatureLabel!.frame.size.height + newHeight!
+                headerView?.backgroundColor = AppUtility.sharedInstance.getRandomColor().withAlphaComponent(self.headerOpacity!)
+                
+                mainScreenTableView?.frame.origin.y = newHeight! + minHeaderHeight
+
+                mainScreenTableView?.frame.size.height = view.frame.size.height - newHeight!
+                
+
+                print(newHeight!)
+            }
+            
+            self.previousScrollOffset = scrollView.contentOffset.y
+            
+        }
+        
+    }
     
+    func canAnimateHeader(_ scrollView: UIScrollView) -> Bool {
+        // Calculate the size of the scrollView when header is collapsed
+        let scrollViewMaxHeight = scrollView.frame.height + headerView!.frame.height - minHeaderHeight
+        
+        // Make sure that when header is collapsed, there is still room to scroll
+        return scrollView.contentSize.height > scrollViewMaxHeight
+    }
+    
+
 }
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         //dataArray[collectionView.tag].count
         if aForecast != nil {
-            if aForecast!.count! > 0 {
+            if aForecast!.count != nil && aForecast!.count! > 0 {
                 return aForecast!.count!
             }
         }
@@ -365,7 +424,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource, 
 }
 
 extension ViewController: UIScrollViewDelegate {
-    
+    /*
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //tag 1234 is main top header view
         print(scrollView.contentInset.top)
@@ -400,4 +459,5 @@ extension ViewController: UIScrollViewDelegate {
         }
         
     }
+     */
 }

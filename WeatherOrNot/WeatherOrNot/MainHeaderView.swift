@@ -24,7 +24,7 @@ class MainHeaderView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        self.frame = CGRect(origin: .zero, size: frame.size)
+        //self.frame = CGRect(origin: .zero, size: frame.size)
         
         let weatherImageFrame: CGRect = CGRect(x: (0.5) * frame.width - (0.5) * 120, y: (0.5) * frame.height - (0.5) * 340, width: 120, height: 120)
         weatherImage = UIImageView(frame: weatherImageFrame)
@@ -62,12 +62,30 @@ class MainHeaderView: UIView {
         temperatureHighLowLabel?.textAlignment = .left
         temperatureHighLowLabel?.text = "#°/#°"
         
+        weatherImage?.isUserInteractionEnabled = true
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(MainHeaderView.addPulse))
+        tapGestureRecognizer.numberOfTapsRequired = 1
+        weatherImage?.addGestureRecognizer(tapGestureRecognizer)
+        
         addSubview(weatherImage!)
         addSubview(weatherLabel!)
         addSubview(temparatureLabel!)
         addSubview(cityNameLabel!)
         addSubview(temperatureHighLowLabel!)
         
+        clipsToBounds = true
+        
+    }
+    func addPulse() {
+        
+        let pulse = Pulsing(numberOfPulses: 1, radius: 100, position: weatherImage!.center)
+        pulse.animationDuration = 0.8
+        pulse.backgroundColor = UIColor.blue.cgColor
+        
+//        self.weatherImage?.layer.insertSublayer(pulse, below: <#T##CALayer?#>)
+        self.layer.insertSublayer(pulse, below: weatherImage?.layer)
+        
+    
     }
     func checkTimeForGreeting() -> String {
         let date = Date()
@@ -109,6 +127,10 @@ class MainHeaderView: UIView {
             temperatureHighLowLabel?.text = "\(highTemp!)°/\(lowTemp!)°"
         }
     }
+//    override func viewWillLayoutSubviews() {
+//        super.viewWillLayoutSubviews()
+//        //        setZoomScale()
+//    }
     /*
     // Only override draw() if you perform custom drawing.
     // An empty implementation adversely affects performance during animation.

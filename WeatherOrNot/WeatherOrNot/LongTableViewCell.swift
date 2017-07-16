@@ -17,7 +17,6 @@ class LongTableViewCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         self.selectionStyle = .none
         
-        self.contentView.backgroundColor = UIColor.blue.withAlphaComponent(0.5)
         
     }
     
